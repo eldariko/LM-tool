@@ -12,11 +12,17 @@ public class Eval {
 HashMap<String, Double> probabilityDictionary;
 int nGramNum;	
 public static void main(String[] args) {
-		Eval eval=new Eval();
-		eval.eval("otherauthors.txt","output.txt");
-
+	if(args.length==4){	
+	Eval eval=new Eval();
+		eval.eval(args[1],args[3]);
+	} else {System.err.println("no valid input . please type according to This structure -  "
+    		+ "–i <inputFile> -m <modelFile>");
+//	Eval eval=new Eval();
+//	eval.eval("lostworld.txt","output.txt");
+	}
 	}
 	public void eval(String inputFileName,String modalFileName){
+		
 		getProbabilities(modalFileName);
 		calcPerplexity(inputFileName);
 		
@@ -51,12 +57,14 @@ public static void main(String[] args) {
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.exit(-1);
 		}
 	}
 	private void calcPerplexity(String inputFileName){
 try {
 			Scanner inputFile=new Scanner(new BufferedReader(new FileReader(inputFileName)));
 		int corpusSize = 0;
+		int notFound=0;
 			double counterProbabilities = 0;
 			String start1="<s>",end1="</s>";
 			ArrayList<String> array=new ArrayList<String>();
@@ -92,7 +100,7 @@ try {
 				   counterProbabilities+=probabilityDictionary.get(c2.toString());
 //				    System.out.println(c2);
 				    }
-//				    else System.out.println("<not found - "+c2+" >");
+//				    else {counterProbabilities+=50;}
 
 				    
 				}
@@ -101,10 +109,12 @@ try {
 corpusSize++;
 s.close();
 			}
-			System.out.println(corpusSize);
+//			System.out.println(corpusSize);
 			double average=counterProbabilities/(corpusSize-nGramNum+1);
 			double perplexity=Math.pow(2, average);
-			System.out.println(average+" "+perplexity);
+//			System.out.println(notFound);
+			System.out.println("entropy= "+average+"\n perplexity= "+perplexity);
+//			System.out.println(average+" "+perplexity);
 			inputFile.close();
 			
 				

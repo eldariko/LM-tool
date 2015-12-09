@@ -25,23 +25,28 @@ LinkedHashMap<String, Float> probabilityDictionary;
 byte nGramNum;
 float corpusSize=0;
 private Scanner s;
+String outPutModalFile;
 public static void main(String[] args)  {	
-//    if(args.length==8)	{
-//    	
-//    }
+    
+	if(args.length==6){
 			LM lm=new LM();
-		    lm.lmCreator((byte) 1);	
-		
-		
+		    lm.lmCreator(Byte.parseByte(args[1]),args[3],args[5]);	
+        }
+        else {System.err.println("no valid input . please type according to This structure -  "
+        		+ "-n <1-5 gram> -i <inputcorpusFile> -o <outputmodelFile>");
+//        LM lm=new LM();
+//	    lm.lmCreator((byte)2,"holmes.txt","output.txt");
+        }
 
 }
 	
-public void lmCreator(byte nGramNum){
+public void lmCreator(byte nGramNum,String inputCorpusFile,String outPutModalFile){
 	try{
-		this.nGramNum=nGramNum=1;
+		this.outPutModalFile=outPutModalFile;
+		this.nGramNum=nGramNum;
 		String start1="<s>",start2="<s2>",start3="<s3>",start4="<s4>",start5="<s5>";
 		String end1="</s>",end2="</s2>",end3="</3>",end4="</s4>",end5="</s5>";
-		Scanner corpus=new Scanner(new BufferedReader(new FileReader("holmes.txt")));
+		Scanner corpus=new Scanner(new BufferedReader(new FileReader(inputCorpusFile)));
 		dictionary=new LinkedHashMap<String, Integer>();
 		biGramDictionary=new LinkedHashMap<String, Integer>();
 		ArrayList<String> array=new ArrayList<String>();	
@@ -97,7 +102,7 @@ public void lmCreator(byte nGramNum){
 				printToFile(dictionary, "");
 			else printToFile(biGramDictionary, " ");
 			
-		System.out.println(corpusSize);
+//		System.out.println(corpusSize);
 		
 	}catch(FileNotFoundException e){
 		e.printStackTrace();
@@ -116,7 +121,7 @@ private void addToDictionary(LinkedHashMap<String, Integer> map,String word){
 private void printToFile(LinkedHashMap<String, Integer> map,String delim){
 	PrintWriter writer = null;
 	try {
-		writer = new PrintWriter(new FileWriter("output.txt"));
+		writer = new PrintWriter(new FileWriter(outPutModalFile));
 	} catch (IOException e1) {
 		e1.printStackTrace();
 	}
@@ -151,63 +156,9 @@ private void printToFile(LinkedHashMap<String, Integer> map,String delim){
 //	System.out.println(counter);
 	writer.println("\n\\end\\");
 	writer.flush();
+
+System.out.println("task complete !");
 }
-private void calcStartProp() throws IOException{
-	String start="<s>";
-	String end="</s>";
-	Scanner corpus=new Scanner(new BufferedReader(new FileReader("holmes.txt")));
-	dictionary=new LinkedHashMap<String, Integer>();
-	biGramDictionary=new LinkedHashMap<String, Integer>();
-	ArrayList<String> array=new ArrayList<String>();
-		float e=0;
-		corpus.useDelimiter("[.]+");
-		while(corpus.hasNext())
-		{
-			Scanner s= new Scanner(corpus.next().replaceAll("\\r\\n|\\r|\\n", " ").trim());
-			String c1=null;
-			String c2=null;
-			addToDictionary(dictionary,start);
-			addToDictionary(dictionary, end);
-			while (s.hasNext()){
-				c1=s.next();
-				addToDictionary(dictionary, c1);
-				array.add(c1);
-				e++;
-			}
-			if(array.size()>0){	
-			addToDictionary(biGramDictionary,start+" "+array.get(0).trim());	
-				String w=null;
-				for (int i=0;i<array.size()-1;i++) {
-                w=array.get(i).trim()+" "+array.get(i+1).trim();
-					addToDictionary(biGramDictionary,array.get(i).trim()+" "+array.get(i+1).trim());
-				}
-				addToDictionary(biGramDictionary,array.get(array.size()-1).trim()+" "+end);
-			array.clear();
-			
-			}
-    
-			
-			e++;
-			
-			//System.out.println(word);
-		}
-		corpus.close();
-//		System.out.println(e);
-		int wordsSize = 0;
-		
-		
-		PrintWriter writer=new PrintWriter(new FileWriter("output.txt"));
-		corpus=new Scanner(new BufferedReader(new FileReader("holmes.txt")));
-		for(Entry<String, Integer> en : biGramDictionary.entrySet()){
-//			System.out.println(en.getKey()+" - "+String.format("%.14f", (float)(en.getValue()/e)));
-			float f=(float)(dictionary.get(en.getKey().split(" ",2)[0])/e);
-			writer.println(en.getKey()+" - "+String.format("%.14f", (float)(en.getValue()/e)/f) );
-		
-		}
-		
-		writer.flush();
-	
-	
-}
+
 }
 
